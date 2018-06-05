@@ -54,3 +54,24 @@ By default, language files are saved into `assets/lang` folder.
 ```` typescript
 console.log( _.t('welcome', {name: '재호'}) );
 ````
+
+### Usability
+
+* If you have a global service like `share`, then you may need to call `t()` like below.
+
+```` typescript
+this.share._.t()
+````
+
+and if it anoys you, you can make it short like below
+
+```` typescript
+
+class ShareService {
+    t(code, info?) {
+        return this._.t(code, info)
+    }
+}
+
+this.share.t(...)
+````
