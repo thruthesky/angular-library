@@ -1,3 +1,8 @@
+/**
+ *
+ * Language related method cannot be static since it must inject HTTPClient.
+ * So, it was put simply not to use static methods.
+ */
 import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, Subject, of, throwError } from 'rxjs';
@@ -32,7 +37,7 @@ export class AngularLibraryService {
         public http: HttpClient
     ) { }
 
-    static get version() {
+    get version() {
         return VERSION;
     }
 
@@ -43,13 +48,6 @@ export class AngularLibraryService {
         return this.lang.texts[this.lang.code];
     }
 
-    abc(v?): Observable<any> {
-        if (v) {
-            return of(v);
-        } else {
-            return throwError('no value');
-        }
-    }
 
     /**
      * Returns browser language
