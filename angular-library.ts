@@ -3,6 +3,7 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, Subject, of, throwError } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 
+const VERSION = '0.2';
 const LANGUAGE_CODE = 'language_code';
 
 interface Language {
@@ -31,20 +32,24 @@ export class AngularLibraryService {
         public http: HttpClient
     ) { }
 
+    static get version() {
+        return VERSION;
+    }
+
     get lang() {
         return AngularLibraryService.language;
     }
     get ln() {
-        return this.lang.texts[ this.lang.code ];
+        return this.lang.texts[this.lang.code];
     }
 
-abc(v?): Observable<any> {
-    if ( v ) {
-        return of(v);
-    } else {
-        return throwError('no value');
+    abc(v?): Observable<any> {
+        if (v) {
+            return of(v);
+        } else {
+            return throwError('no value');
+        }
     }
-}
 
     /**
      * Returns browser language
@@ -149,7 +154,7 @@ abc(v?): Observable<any> {
      * @see README
      */
     setUserLanguage(code?: string) {
-        if ( code ) {
+        if (code) {
             this.set(LANGUAGE_CODE, code);
         } else {
             code = this.getUserLanguage();
@@ -177,7 +182,7 @@ abc(v?): Observable<any> {
         const url = this.getLanguagePath(code);
         // console.log(`loadLanguage: url: ${url}`);
         return this.http.get(url).pipe(
-            map( re => {
+            map(re => {
                 // console.log('pipe: map: ', re);
                 if (re) {
                     const keys = Object.keys(re);
@@ -192,12 +197,12 @@ abc(v?): Observable<any> {
                     }
                 }
                 this.lang.texts[code] = re;
-                           /// Sets reference of current language texts. @see README
+                /// Sets reference of current language texts. @see README
                 // console.log(` =========== >>>>> Language ${ln} has been set.`);
                 // return this.ln;
                 return this.ln;
             }),
-            catchError( e => {
+            catchError(e => {
                 // console.log('e: ', e);
                 return throwError(e);
             })
