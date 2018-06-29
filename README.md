@@ -12,20 +12,7 @@ If we build it as node module, it would be more easier to use. But we choose it 
 git submodule add https://github.com/thruthesky/angular-library src/app/modules/angular-library
 ````
 
-I recommend to use it as a member variable object of global service.
-
-For instance, most apps need a global service which is injected in app module or app component on bootstrapping and will be injected in most of all components.
-
-If you inject it as a member of global service, you don't have to care about the path where you install `angular-library`.
-
-```` typescript
-@NgModule({
-  imports: [
-    HttpClientModule
-  ],
-  providers: [ AngularLibraryService ]
-})
-````
+* And add `AngularLibraryServiceModule` whereever you want to use.
 
 ### Dependencies
 
