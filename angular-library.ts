@@ -5,8 +5,8 @@
  */
 import { Injectable, EventEmitter } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, Subject, of, throwError } from 'rxjs';
-import { map, catchError } from 'rxjs/operators';
+import { Observable, of, throwError, fromEvent } from 'rxjs';
+import { map, catchError, debounceTime } from 'rxjs/operators';
 
 const VERSION = '0.2';
 const LANGUAGE_CODE = 'language_code';
@@ -405,9 +405,12 @@ export class AngularLibraryService {
     }
 
     /**
+     * Compares Scalars, Arrays, Objects.
+     *
      * Returns true if the input `a` and `b` are identical.
-     * @param a Object a
-     * @param b Object b
+     *
+     * @param a It can be an array, string, number, objects.
+     * @param b It can be an array, string, number, objects.
      */
     isEqual(a, b): boolean {
         if (typeof a === 'object' && typeof b === 'object') {
@@ -421,12 +424,23 @@ export class AngularLibraryService {
             if (a.length !== b.length) {
                 return false;
             } else {
+                for (let i = 0; i < a.length; i++) {
+                    if (a[i] !== b[i]) {
+                        return false;
+                    }
+                }
+                return true;
             }
         } else {
             return a === b;
         }
     }
 
+    /**
+     * Returns true if the input `str` is a string.
+     *
+     * @param str any value
+     */
     isString(str) {
         return typeof str === 'string';
     }
@@ -476,6 +490,76 @@ export class AngularLibraryService {
         }
     }
 
+    /**
+     * returns page width
+     *
+     * $sm: 576px;
+        $md: 768px;
+        $lg: 992px;
+        $xg: 1200px;
+     */
+    pageWidth(): number {
+        return window.innerWidth;
+    }
 
+    xs(): boolean {
+        return this.pageWidth() < 576;
+    }
+    /**
+     * Returns true if page width is bigger than 575px
+     */
+    sm(): boolean {
+        return this.pageWidth() >= 576;
+    }
+    /**
+     * Returns true if page width is bigger than 767px
+     */
+    md(): boolean {
+        return this.pageWidth() >= 768;
+    }
+    /**
+     * Returns true if page width is bigger than 991px
+     */
+    lg(): boolean {
+        return this.pageWidth() >= 992;
+    }
+    /**
+     * Returns true if page width is bigger than 1999px
+     */
+    xg(): boolean {
+        return this.pageWidth() >= 1200;
+    }
+
+
+    /**
+     * Listens for window resize.
+     *
+     * You will need to detach the event linstener manually or unless it will subscribe muliple times of window resize event
+     *  Resulting in listening multiple times of event.
+     *
+     * @param ms is the mili seconds for debouncing time.
+     * @example
+            constructor(
+                public _: AngularLibraryService
+            ) {
+                // Window resize handler.
+                _.windowResize().subscribe((event: Event) => {
+                    console.log('resize event: ', event);
+                });
+
+                // This one is for re-drawing the page after window has been resized.
+                _.windowResize(3000).subscribe((event: Event) => {
+                    console.log('resize event handler for redrawing : ', event);
+                    this.render();
+                });
+            }
+
+     * @desc Good place of calling method to observe window resize is in an App Serivce.
+     */
+    windowResize(ms = 100) {
+        return fromEvent(window, 'resize').pipe(
+            debounceTime(ms)
+        );
+    }
 
 }
