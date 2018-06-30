@@ -562,4 +562,25 @@ export class AngularLibraryService {
         );
     }
 
+    /**
+     * It scrolls the page to the top.
+     *
+     * Use this method when you need to scroll to the top of the page.
+     *
+     * @param timeout timeout ms
+     * @example
+     *      _.scrollToTop();
+     *      _.scrollToTop(50);
+     */
+    scrollToTop(timeout?) {
+        if (timeout) {
+            setTimeout(() => {
+                window.document.body.scrollTop = window.document.documentElement.scrollTop = 0;
+                // console.log('scroll, ', timeout);
+            }, timeout);
+        } else {
+            window.document.body.scrollTop = window.document.documentElement.scrollTop = 0;
+        }
+    }
+
 }
