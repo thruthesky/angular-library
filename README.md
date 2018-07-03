@@ -2,6 +2,11 @@
 
 Angular Library
 
+## TODOs
+
+* remove language functionality and make it static.
+* publish as node js package.
+
 ## Install
 
 It's not a module. so, you need to install it by `git submodule add`.
@@ -22,9 +27,16 @@ git submodule add https://github.com/thruthesky/angular-library src/app/modules/
 
 By default, language files are saved into `assets/lang` folder.
 
-`setUserLanguage()` will (1) set user language into localStorage or gets previously selected language from localStorage.
-(2) load that language file.
-(3) make it selected.
+To set or load a language from language folder, simple call `setUserLanguage()` method.
+
+`setUserLanguage()` will
+(1) If a language code is given, it sets user language code into localStorage
+    Or if language code is not given, then it gets previously selected language from localStorage.
+    If language code is not given, and user has not chosen a languge code before, then it will use browser language code.
+(2) Then, it loads language file of that language code.
+(3) Then, it will make the language text as selected. So, it can be used by other language methods.
+
+* Example of setting/loading a language. It should be called in a global app service.
 
 ```` typescript
     _.setUserLanguage().subscribe(re => {

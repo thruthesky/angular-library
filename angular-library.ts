@@ -3,49 +3,20 @@
  * Language related method cannot be static since it must inject HTTPClient.
  * So, it was put simply not to use static methods.
  */
-import { Injectable, EventEmitter } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
-import { Observable, of, throwError, fromEvent } from 'rxjs';
-import { map, catchError, debounceTime } from 'rxjs/operators';
+import { fromEvent } from 'rxjs';
+import { debounceTime } from 'rxjs/operators';
 
 const VERSION = '0.2';
 const LANGUAGE_CODE = 'language_code';
 
-interface Language {
-    code: string;
-    folder: string;
-    texts: {
-        [code: string]: any;
-    };
-    load: EventEmitter<any>;
-    change: EventEmitter<string>;
-}
 
-@Injectable()
-export class AngularLibraryService {
-
-    static language: Language = {
-        code: '',
-        folder: 'assets/lang',
-        texts: {},
-        load: new EventEmitter(),
-        change: new EventEmitter()
-    };
-
+export class AngularLibrary {
 
     constructor(
-        public http: HttpClient
     ) { }
 
-    get version() {
+    static get version() {
         return VERSION;
-    }
-
-    get lang() {
-        return AngularLibraryService.language;
-    }
-    get ln() {
-        return this.lang.texts[this.lang.code];
     }
 
 
@@ -59,7 +30,7 @@ export class AngularLibraryService {
      *      - the browser language like 'en', 'en-US', 'ko', 'ko-KR'
      *      - null if it cannot detect a language.
      */
-    private getBrowserLanguage(full = false): string {
+    static getBrowserLanguage(full = false): string {
         const nav = window.navigator;
         const browserLanguagePropertyKeys = ['language', 'browserLanguage', 'systemLanguage', 'userLanguage'];
         let ln: string = null;
@@ -101,7 +72,7 @@ export class AngularLibraryService {
      *      null if there is error or there is no value.
      *      Or value that were saved.
      */
-    get(key: string): any {
+    static get(key: string): any {
         const value = localStorage.getItem(key);
         if (value !== null) {
             try {
@@ -124,7 +95,7 @@ export class AngularLibraryService {
      * @param key key
      * @param data data to save in localStorage
      */
-    set(key, data): void {
+    static set(key, data): void {
         // console.log("storage::set()", data);
         localStorage.setItem(key, JSON.stringify(data));
     }
@@ -138,149 +109,17 @@ export class AngularLibraryService {
      *
      * @return language code.
      */
-    getUserLanguage(): string {
-        const ln = this.get(LANGUAGE_CODE);
+    static getUserLanguage(): string {
+        const ln = AngularLibrary.get(LANGUAGE_CODE);
         if (ln && ln.length === 2) {
             return ln;
         } else {
-            return this.getBrowserLanguage();
+            return AngularLibrary.getBrowserLanguage();
         }
     }
 
-
-    /**
-     * @see README
-     */
-    setUserLanguage(code?: string) {
-        if (code) {
-            this.set(LANGUAGE_CODE, code);
-        } else {
-            code = this.getUserLanguage();
-        }
-        return this.loadLanguage(code);
-    }
-
-    getLanguagePath(code: string): string {
-        return this.lang.folder + '/' + code + '.json';
-    }
-
-
-    /**
-     *
-     * loads a language json file.
-     *
-     *
-     *
-     */
-    loadLanguage(code: string): Observable<any> {
-        this.lang.code = code;
-        if (this.lang.texts[code]) {
-            return of(this.ln);
-        }
-        const url = this.getLanguagePath(code);
-        // console.log(`loadLanguage: url: ${url}`);
-        return this.http.get(url).pipe(
-            map(re => {
-                // console.log('pipe: map: ', re);
-                if (re) {
-                    const keys = Object.keys(re);
-                    if (keys.length) {                /// Make the case of keys uppercase. @see README.
-                        for (const k of keys) {
-                            const uppercase = k.toLocaleUpperCase();
-                            if (k !== uppercase) {
-                                re[uppercase] = re[k];
-                                delete re[k];
-                            }
-                        }
-                    }
-                }
-                this.lang.texts[code] = re;
-                /// Sets reference of current language texts. @see README
-                // console.log(` =========== >>>>> Language ${ln} has been set.`);
-                // return this.ln;
-                return this.ln;
-            }),
-            catchError(e => {
-                // console.log('e: ', e);
-                return throwError(e);
-            })
-        );
-    }
-
-
-
-    /**
-     * Returns the texts of the input code.
-     *
-     * It does not translates. Meaning it does not add `information` to the result text. It simply returns.
-     * If the language is not `en`, then it gets the text of the language.
-     *
-     * @param code code. This is not language code. It's the text code. The code will be transformed to uppercase.
-     *
-     * @returns text of that code.
-     *      - if the code does not exist on text file, then it returns the code itself.
-     *
-     *      - if `code` is falsy, it returns the whole texts of the language code.
-     *
-     * @example How to display texts on template
-     *          {{ fire.getText() | json }}
-     */
-    getText(code?: string): string {
-        const ln = this.lang.code; // two letters of langage code.
-        if (!code) {
-            return this.lang.texts[ln];
-        }
-        code = code.toUpperCase();
-        const texts = this.lang.texts; // whole texts including whole language codes.
-
-        /**
-         * `text` should hold the text of the language code.
-         */
-        let text = null; // the selected text string.
-        if (this.lang.code !== 'en') { // if not English,
-            if (texts[ln] !== void 0 && texts[ln][code] !== void 0) { // check if the text of the language exists
-                text = texts[ln][code];
-            }
-        }
-
-        // console.log('code: ', code, 'text: ', text);
-        /**
-         * If `text` has not any value, then the language( language file ) has no text for that code.
-         * So, it is going to get text from English langauge file by default.
-         */
-        if (!text) { // if current language is `English` or the text of that language not found,
-            if (texts['en'] && texts['en'][code]) { // get the text of the code in English
-                text = texts['en'][code];
-            }
-        }
-        if (!text) { // if no text found, return the code.
-            text = code;
-        }
-        return text;
-    }
-
-    /**
-     * Returns translated text string.
-     * @param code code to translate
-     * @param info information to add on the translated text
-     *
-     * @example
-     *          {{ fire.translate('HOME') }}
-     *          {{ fire.t('HOME') }}
-     *          {{ fire.ln.HOME }}
-     */
-    translate(code: string, info?): string {
-        return this.patchMarker(this.getText(code), info);
-    }
-
-    /**
-     * Alias of translate()
-     * @param code same as translate()
-     * @param info same as transate()
-     */
-    t(code: any, info?: any): string {
-        // console.log('code', code);
-        return this.translate(code, info);
+    static setUserLanguage(code: string) {
+        AngularLibrary.set(LANGUAGE_CODE, code);
     }
 
 
@@ -298,7 +137,7 @@ export class AngularLibraryService {
      *      _.patchmarker( 'Unknown #no', {no: 123} ) // returns 'Unknown 123'
      *
      */
-    patchMarker(str, info: object = null): string {
+    static patchMarker(str, info: object = null): string {
 
         if (info === null || typeof info !== 'object') {
             return str;
@@ -318,14 +157,17 @@ export class AngularLibraryService {
 
     /**
      * Returns http query string.
+     *
+     * @desc This method is not perfect. It is not developed for complicated query.
+     *
      * @param params Object to build as http query string
      * @return
      *      - http query string
      *      - Or null if the input is emtpy or not object.
      */
-    httpBuildQuery(params): string | null {
+    static httpBuildQuery(params): string | null {
 
-        if (this.isEmpty(params)) {
+        if (AngularLibrary.isEmpty(params)) {
             return null; //
         }
 
@@ -361,7 +203,7 @@ export class AngularLibraryService {
      *      return this.library.segment( str, '.', 0 ); // returns `abc`
      *
      */
-    segment(str: string, separator: string = ' ', n: number = 0): string {
+    static segment(str: string, separator: string = ' ', n: number = 0): string {
         if (typeof str !== 'string') {
             return null;
         }
@@ -391,7 +233,7 @@ export class AngularLibraryService {
      *
      *      - otherwise return false.
      */
-    isEmpty(what): boolean {
+    static isEmpty(what): boolean {
         if (!what) {
             return true; // for number, string, boolean, any falsy.
         }
@@ -412,7 +254,7 @@ export class AngularLibraryService {
      * @param a It can be an array, string, number, objects.
      * @param b It can be an array, string, number, objects.
      */
-    isEqual(a, b): boolean {
+    static isEqual(a, b): boolean {
         if (typeof a === 'object' && typeof b === 'object') {
             const aKeys = Object.keys(a);
             const bKeys = Object.keys(b);
@@ -441,7 +283,7 @@ export class AngularLibraryService {
      *
      * @param str any value
      */
-    isString(str) {
+    static isString(str) {
         return typeof str === 'string';
     }
 
@@ -457,7 +299,7 @@ export class AngularLibraryService {
      *
      * @return the input object that has sanitized.
      */
-    sanitize(obj): any {
+    static sanitize(obj): any {
         if (obj) {
             if (typeof obj === 'object') {
                 Object.keys(obj).forEach(key => obj[key] === undefined && delete obj[key]);
@@ -482,7 +324,7 @@ export class AngularLibraryService {
      * @returns a string after removing spaces between the `separator`.
      *      - if the string is falsy, it returns the input `str` itself.
      */
-    removeSpaceBetween(separator: string, str: string): string {
+    static removeSpaceBetween(separator: string, str: string): string {
         if (!str) {
             return str;
         } else {
@@ -498,36 +340,36 @@ export class AngularLibraryService {
         $lg: 992px;
         $xg: 1200px;
      */
-    pageWidth(): number {
+    static pageWidth(): number {
         return window.innerWidth;
     }
 
-    xs(): boolean {
-        return this.pageWidth() < 576;
+    static xs(): boolean {
+        return AngularLibrary.pageWidth() < 576;
     }
     /**
      * Returns true if page width is bigger than 575px
      */
-    sm(): boolean {
-        return this.pageWidth() >= 576;
+    static sm(): boolean {
+        return AngularLibrary.pageWidth() >= 576;
     }
     /**
      * Returns true if page width is bigger than 767px
      */
-    md(): boolean {
-        return this.pageWidth() >= 768;
+    static md(): boolean {
+        return AngularLibrary.pageWidth() >= 768;
     }
     /**
      * Returns true if page width is bigger than 991px
      */
-    lg(): boolean {
-        return this.pageWidth() >= 992;
+    static lg(): boolean {
+        return AngularLibrary.pageWidth() >= 992;
     }
     /**
      * Returns true if page width is bigger than 1999px
      */
-    xg(): boolean {
-        return this.pageWidth() >= 1200;
+    static xg(): boolean {
+        return AngularLibrary.pageWidth() >= 1200;
     }
 
 
@@ -556,7 +398,7 @@ export class AngularLibraryService {
 
      * @desc Good place of calling method to observe window resize is in an App Serivce.
      */
-    windowResize(ms = 100) {
+    static windowResize(ms = 100) {
         return fromEvent(window, 'resize').pipe(
             debounceTime(ms)
         );
@@ -572,7 +414,7 @@ export class AngularLibraryService {
      *      _.scrollToTop();
      *      _.scrollToTop(50);
      */
-    scrollToTop(timeout?) {
+    static scrollToTop(timeout?) {
         if (timeout) {
             setTimeout(() => {
                 window.document.body.scrollTop = window.document.documentElement.scrollTop = 0;
