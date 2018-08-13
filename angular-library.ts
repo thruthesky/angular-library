@@ -425,4 +425,44 @@ export class AngularLibrary {
         }
     }
 
+    /**
+     * Returns true if the platform is Cordova.
+     */
+    static isCordova(): boolean {
+        const win = window as any;
+        return !!(win['cordova'] || win['phonegap'] || win['PhoneGap']);
+    }
+
+    /**
+     * Returns true if the platform is mobile web. not cordova.
+     */
+    static isMobileWeb(): boolean {
+        if (AngularLibrary.isCordova()) {
+            return false;
+        }
+        if (/Mobi|Android/i.test(navigator.userAgent)) {
+            return true;
+        }
+        return false;
+    }
+
+    /**
+     * Returns cookie value
+     * @param name cookie name
+     */
+    static getCookie(name: string) {
+        const ca: Array<string> = document.cookie.split(';');
+        const cookieName = name + '=';
+        let c: string;
+
+        for (let i = 0; i < ca.length; i += 1) {
+            if (ca[i].indexOf(name, 0) > -1) {
+                c = ca[i].substring(cookieName.length + 1, ca[i].length);
+                // console.log('valore cookie: ' + c);
+                return c;
+            }
+        }
+        return '';
+    }
+
 }
