@@ -386,12 +386,12 @@ export class AngularLibrary {
             ) {
                 // Window resize handler.
                 _.windowResize().subscribe((event: Event) => {
-                    console.log('resize event: ', event);
+                    // console.log('resize event: ', event);
                 });
 
                 // This one is for re-drawing the page after window has been resized.
                 _.windowResize(3000).subscribe((event: Event) => {
-                    console.log('resize event handler for redrawing : ', event);
+                    // console.log('resize event handler for redrawing : ', event);
                     this.render();
                 });
             }

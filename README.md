@@ -40,9 +40,9 @@ To set or load a language from language folder, simple call `setUserLanguage()` 
 
 ```` typescript
     _.setUserLanguage().subscribe(re => {
-      console.log('_.loadUserLanguage(): success: ', re);
+      // console.log('_.loadUserLanguage(): success: ', re);
     }, e => {
-      console.log('_.loadUserLanguage(): failed: ', e);
+      // console.log('_.loadUserLanguage(): failed: ', e);
     });
 ````
 
