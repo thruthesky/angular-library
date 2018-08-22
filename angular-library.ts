@@ -465,4 +465,41 @@ export class AngularLibrary {
         return '';
     }
 
+
+    /**
+     * Returns number from string.
+     * @param v value of number
+     */
+    static parseNumber(v): number {
+        if (isNaN(v)) {
+            return 0;
+        } else {
+            return parseInt(v, 10);
+        }
+    }
+
+
+  static isPushPermissionRequested() {
+    // Let's check if the browser supports notifications
+    if (!('Notification' in window) || Notification === void 0 || Notification['permission'] === void 0) {
+      // console.log('This browser does not support desktop notification');
+      return false;
+    }
+    // console.log(`Notification['permission']`, Notification['permission']);
+    return Notification['permission'] !== 'default';
+  }
+  static isPushPermissionDenied() {
+    if (AngularLibrary.isPushPermissionRequested()) {
+      return Notification['permission'] === 'denied';
+    } else {
+      return false;
+    }
+  }
+  static isPushPermissionGranted() {
+    if (AngularLibrary.isPushPermissionRequested()) {
+      return Notification['permission'] === 'granted';
+    } else {
+      return false;
+    }
+  }
 }
