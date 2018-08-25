@@ -509,4 +509,14 @@ export class AngularLibrary {
             return false;
         }
     }
+
+    /**
+     * returns the last element of array or undefined if there is no value.
+     * @param arr array
+     */
+    static last( arr ) {
+        if ( arr && arr.length ) {
+            return arr[ arr.length - 1];
+        }
+    }
 }
