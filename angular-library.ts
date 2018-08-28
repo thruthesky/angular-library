@@ -519,4 +519,18 @@ export class AngularLibrary {
             return arr[ arr.length - 1];
         }
     }
+
+    /**
+     * Returns true if the mime type is for image.
+     * @param type Mime type
+     */
+    static isImageType( type: string ): boolean {
+        if ( type === void 0 || ! type || typeof type !== 'string' ) {
+            return false;
+        }
+        if ( type.indexOf('image') !== 0 ) {
+            return false;
+        }
+        return true;
+    }
 }
