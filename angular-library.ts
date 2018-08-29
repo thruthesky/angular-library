@@ -478,7 +478,11 @@ export class AngularLibrary {
             if (isNaN(v)) {
                 return 0;
             } else {
-                return parseInt(v, 10);
+                if (typeof v === 'number') {
+                    return v;
+                } else {
+                    return parseInt(v, 10);
+                }
             }
         } else {
             return 0;
@@ -514,9 +518,9 @@ export class AngularLibrary {
      * returns the last element of array or undefined if there is no value.
      * @param arr array
      */
-    static last( arr ) {
-        if ( arr && arr.length ) {
-            return arr[ arr.length - 1];
+    static last(arr) {
+        if (arr && arr.length) {
+            return arr[arr.length - 1];
         }
     }
 
@@ -524,13 +528,30 @@ export class AngularLibrary {
      * Returns true if the mime type is for image.
      * @param type Mime type
      */
-    static isImageType( type: string ): boolean {
-        if ( type === void 0 || ! type || typeof type !== 'string' ) {
+    static isImageType(type: string): boolean {
+        if (type === void 0 || !type || typeof type !== 'string') {
             return false;
         }
-        if ( type.indexOf('image') !== 0 ) {
+        if (type.indexOf('image') !== 0) {
             return false;
         }
         return true;
     }
+
+    static humanFileSize(size: any) {
+        // var i = Math.floor(Math.log(size) / Math.log(1024));
+        size = AngularLibrary.parseNumber(size);
+        const i = size == 0 ? 0 : Math.floor(Math.log(size) / Math.log(1024));
+        return (<any>(size / Math.pow(1024, i))).toFixed(2) * 1 + '' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
+    };
+
+
+    /**
+     * strip out HTML tags.
+     * @param str string
+     */
+    static stripTags(str) {
+        return str.replace(/<\/?.+?>/ig, '');
+    }
+
 }
