@@ -545,13 +545,22 @@ export class AngularLibrary {
         return (<any>(size / Math.pow(1024, i))).toFixed(2) * 1 + '' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
     };
 
-
     /**
      * strip out HTML tags.
      * @param str string
      */
     static stripTags(str) {
         return str.replace(/<\/?.+?>/ig, '');
+    }
+
+    /**
+     * Returns the salt
+     * @param len length of random string without the length of salt
+     * @param salt salt
+     */
+    static randomString(len = 15, salt = ''): string {
+        const rnd = Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2);
+        return salt + rnd.substring(2, len + 2);
     }
 
 }
