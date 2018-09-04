@@ -560,7 +560,12 @@ export class AngularLibrary {
      */
     static randomString(len = 15, salt = ''): string {
         const rnd = Math.random().toString(36).substr(2) + Math.random().toString(36).substr(2);
-        return salt + rnd.substring(2, len + 2);
+        const str = rnd.substring(2, len + 2);
+        if (salt) {
+            return salt + str;
+        } else {
+            return str;
+        }
     }
 
 }
