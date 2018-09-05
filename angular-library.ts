@@ -568,4 +568,34 @@ export class AngularLibrary {
         }
     }
 
+
+    /**
+     * Return binary from Base64.
+     * Base64 데이터를 바이너리로 변경해서 리턴한다.
+     *
+     */
+    static base64toBlob(b64Data, contentType = 'image/jpeg', sliceSize = 512): Blob {
+        const byteCharacters = atob(b64Data);
+        const byteArrays = [];
+        for (let offset = 0; offset < byteCharacters.length; offset += sliceSize) {
+            const slice = byteCharacters.slice(offset, offset + sliceSize);
+            const byteNumbers = new Array(slice.length);
+            for (let i = 0; i < slice.length; i++) {
+                byteNumbers[i] = slice.charCodeAt(i);
+            }
+            const byteArray = new Uint8Array(byteNumbers);
+            byteArrays.push(byteArray);
+        }
+        const blob = new Blob(byteArrays, { type: contentType });
+        return blob;
+    }
+
+    /**
+     * Returns date string in 'YYYYMMDD-HHIISS'.
+     */
+    static dateString() {
+        const d = new Date();
+        return d.getFullYear() + (d.getMonth() + 1) + d.getDate() + '-' + d.getHours() + d.getMinutes() + d.getSeconds();
+    }
+
 }
