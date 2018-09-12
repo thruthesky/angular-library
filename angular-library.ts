@@ -432,6 +432,9 @@ export class AngularLibrary {
         const win = window as any;
         return !!(win['cordova'] || win['phonegap'] || win['PhoneGap']);
     }
+    static isWeb(): boolean {
+        return !AngularLibrary.isCordova();
+    }
 
     /**
      * Returns true if the platform is mobile web. not cordova.
