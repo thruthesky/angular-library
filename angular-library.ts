@@ -355,6 +355,11 @@ export class AngularLibrary {
     }
     /**
      * Returns true if page width is bigger than 767px
+     * 
+     * @example below shows footer only on narrow size.
+     * 
+     *      <ion-footer *ngIf=" ! _.md() ">
+     *
      */
     static md(): boolean {
         return AngularLibrary.pageWidth() >= 768;
