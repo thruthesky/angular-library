@@ -601,4 +601,28 @@ export class AngularLibrary {
         return d.getFullYear() + (d.getMonth() + 1) + d.getDate() + '-' + d.getHours() + d.getMinutes() + d.getSeconds();
     }
 
+
+    /**
+     * @see https://www.jstips.co/en/javascript/create-range-0...n-easily-using-one-line/
+     * @see https://jsperf.com/create-1-n-range
+     *
+     * @param n 0...N number to return as array.
+     * @param base default
+     */
+    static makeArrayNumber(n: number = 0, base: number = 0): Array<number> {
+        // return Array.apply(null, {length: n}).map((value, index) => index + indexStart);
+        const arr = [];
+        for (let i = 0; i < n; i++) {
+            arr.push(i + base);
+        }
+        return arr;
+    }
+
+    static getAge(birthday) {
+        const n = new Date();
+        const year = birthday.substr(0, 4);
+        return n.getFullYear() - parseInt(year, 10);
+    }
+
+
 }
