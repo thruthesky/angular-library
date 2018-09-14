@@ -629,5 +629,9 @@ export class AngularLibrary {
         return n.getFullYear() - parseInt(year, 10);
     }
 
+    static keys(o): Array<string> {
+        return Object.keys(o);
+    }
+
 
 }
