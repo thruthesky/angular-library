@@ -355,9 +355,9 @@ export class AngularLibrary {
     }
     /**
      * Returns true if page width is bigger than 767px
-     * 
+     *
      * @example below shows footer only on narrow size.
-     * 
+     *
      *      <ion-footer *ngIf=" ! _.md() ">
      *
      */
@@ -522,6 +522,44 @@ export class AngularLibrary {
         }
     }
 
+
+    /**
+     * (Cordova 가 아니고) 푸시 권한을 물어보지 않았으면 참을 리턴. ( 이미 물어봤으면 false 를 리턴 )
+     * Check if 'push notification' permission has requested to the user or not.
+     *
+     * @returns
+     *      true - if the Permission is not requested yet. So, it needs to request.
+     *      false - if the Permission is already requested to the user
+     *              or if the platform is Cordova
+     */
+    static get isWebPushPermissionNotRequested(): boolean {
+        if (!AngularLibrary.isCordova()) {
+            if (!AngularLibrary.isPushPermissionRequested()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * 푸시 권한을 거절했으면 참을 리턴.
+     * Return true if the user rejected push notification.
+     *
+     * @returns
+     *      true - (Cordova 가 아니고) 거절 했으면, 참.
+     *      false - Cordova 이거나 거절을 안했으면 false.
+     */
+    static get isWebPushPermissionDenied(): boolean {
+        if (!AngularLibrary.isCordova()) {
+            if (AngularLibrary.isPushPermissionDenied()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
+
     /**
      * returns the last element of array or undefined if there is no value.
      * @param arr array
@@ -549,9 +587,9 @@ export class AngularLibrary {
     static humanFileSize(size: any) {
         // var i = Math.floor(Math.log(size) / Math.log(1024));
         size = AngularLibrary.parseNumber(size);
-        const i = size == 0 ? 0 : Math.floor(Math.log(size) / Math.log(1024));
+        const i = size === 0 ? 0 : Math.floor(Math.log(size) / Math.log(1024));
         return (<any>(size / Math.pow(1024, i))).toFixed(2) * 1 + '' + ['B', 'kB', 'MB', 'GB', 'TB'][i];
-    };
+    }
 
     /**
      * strip out HTML tags.
